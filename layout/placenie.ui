@@ -73,7 +73,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="numer_konta">
       <property name="text">
        <string>Numer konta</string>
       </property>
@@ -83,7 +83,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QLabel" name="label_4">
+     <widget class="QLabel" name="kwota_brutto">
       <property name="text">
        <string>Kwota Brutto - </string>
       </property>
@@ -98,6 +98,13 @@
        <widget class="QPushButton" name="zaplacono">
         <property name="text">
          <string>Zapłacono</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="open_file">
+        <property name="text">
+         <string>Otwórz plik</string>
         </property>
        </widget>
       </item>

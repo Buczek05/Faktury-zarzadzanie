@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>895</width>
-    <height>343</height>
+    <width>793</width>
+    <height>812</height>
    </rect>
+  </property>
+  <property name="baseSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -19,59 +25,718 @@
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>891</width>
-      <height>301</height>
+      <width>751</width>
+      <height>101</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="lyt_main" stretch="">
+     <property name="leftMargin">
+      <number>5</number>
+     </property>
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <property name="rightMargin">
+      <number>5</number>
+     </property>
+     <property name="bottomMargin">
+      <number>5</number>
+     </property>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_9">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>659</width>
+      <height>137</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="filers_and_buttons">
      <item>
-      <widget class="QTableWidget" name="tableWidget">
-       <property name="editTriggers">
-        <set>QAbstractItemView::NoEditTriggers</set>
+      <layout class="QHBoxLayout" name="filters">
+       <item>
+        <layout class="QVBoxLayout" name="lyt_data_wystawienia" stretch="0,0,0,0,0,0">
+         <item>
+          <widget class="QLabel" name="label_data_wystawienia">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Data wystawienia</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_data_wystawienia">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Przedział</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_data_wystawienia_od">
+           <item>
+            <widget class="QLabel" name="label_data_wystawienia_od">
+             <property name="text">
+              <string>Od: </string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="dateEdit_data_wystawienia_od"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_data_wystawienia_do">
+           <item>
+            <widget class="QLabel" name="label_data_wystawienia_do">
+             <property name="text">
+              <string>Do: </string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="dateEdit_data_wystawienia_do"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="dateEdit_data_wystawienia_konkretna"/>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="lyt_numer_FV">
+         <item>
+          <widget class="QLabel" name="label_numer_fv">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Numer FV</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_numer_FV">
+           <property name="title">
+            <string/>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_numer_fv">
+           <property name="placeholderText">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="lyt_sprzedawca">
+         <item>
+          <widget class="QLabel" name="label_sprzedawca">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Sprzedawca</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_sprzedawca">
+           <property name="title">
+            <string/>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_sprzedawca">
+           <property name="placeholderText">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="lyt_kwota_netto" stretch="0,0,0,0,0,0">
+         <item>
+          <widget class="QLabel" name="label_kwota_netto">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Kwota netto</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_kwota_netto">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Przedział</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_kwota_netto_od">
+           <item>
+            <widget class="QLabel" name="label_kwota_netto_od">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>≥</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_od"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_kwota_netto_do">
+           <item>
+            <widget class="QLabel" name="label_kwota_netto_do">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>≤</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_do"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_konkretna"/>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="lyt_kwota_brutto" stretch="0,0,0,0,0,0">
+         <item>
+          <widget class="QLabel" name="label_kwota_brutto">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Kwota brutto</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_kwota_brutto">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Przedział</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_kwota_brutto_od">
+           <item>
+            <widget class="QLabel" name="label_kwota_brutto_od">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>≥</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_od"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_kwota_brutto_do">
+           <item>
+            <widget class="QLabel" name="label_kwota_brutto_do">
+             <property name="font">
+              <font>
+               <pointsize>11</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="text">
+              <string>≤</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_do"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_konkretna"/>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="lyt_nr_konta" stretch="1,1,1">
+         <item>
+          <widget class="QLabel" name="label_nr_konta">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Numer konta</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="groupBox_nr_konta">
+           <property name="title">
+            <string/>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_nr_konta">
+           <property name="placeholderText">
+            <string>...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="lyt_termin_platnosci" stretch="0,0,0,0,0,0">
+         <item>
+          <widget class="QLabel" name="label_termin_platnosci">
+           <property name="font">
+            <font>
+             <pointsize>10</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Termin płatności</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignHCenter|Qt::AlignTop</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_termin_platnosci">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="text">
+            <string>Przedział</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_termin_platnosci_od">
+           <item>
+            <widget class="QLabel" name="label_termin_platnosci_od">
+             <property name="text">
+              <string>Od: </string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="dateEdit_termin_platnosci_od"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="lyt_termin_platnosci_do">
+           <item>
+            <widget class="QLabel" name="label_termin_platnosci_do">
+             <property name="text">
+              <string>Do: </string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QDateEdit" name="dateEdit_termin_platnosci_do"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QDateEdit" name="dateEdit_termin_platnosci_konkretna"/>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="filters_buttons">
+       <item>
+        <widget class="QPushButton" name="btn_search">
+         <property name="text">
+          <string>Szukaj</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_clear_search">
+         <property name="text">
+          <string>Wyczyść filtry</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>300</y>
+      <width>741</width>
+      <height>295</height>
+     </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <attribute name="verticalHeaderVisible">
+     <bool>false</bool>
+    </attribute>
+    <column>
+     <property name="text">
+      <string>Data wystawienia FV</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Numer FV</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Sprzedawca</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Kwota netto</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Kwota brutto</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Nr konta bankowego</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Status FV</string>
+     </property>
+    </column>
+    <column>
+     <property name="text">
+      <string>Termin płatności</string>
+     </property>
+    </column>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_10">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>600</y>
+      <width>160</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="lyt_numer_FV_radio_btn">
+     <item>
+      <widget class="QRadioButton" name="radioButton_numer_FV_contain">
+       <property name="text">
+        <string>Zawiera</string>
        </property>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
-       <column>
-        <property name="text">
-         <string>Data wystawienia FV</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Numer FV</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Sprzedawca</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Kwota netto</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Kwota brutto</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Nr konta bankowego</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Status FV</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
-         <string>Termin płatności</string>
-        </property>
-       </column>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_numer_FV_equal">
+       <property name="text">
+        <string>Równy</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_numer_FV_not_contain">
+       <property name="text">
+        <string>Nie zawiera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_numer_FV_different">
+       <property name="text">
+        <string>Różny</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_11">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>600</y>
+      <width>160</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="lyt_sprzedawca_radio_btn">
+     <item>
+      <widget class="QRadioButton" name="radioButton_sprzedawca_contain">
+       <property name="text">
+        <string>Zawiera</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_sprzedawca_equal">
+       <property name="text">
+        <string>Równy</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_sprzedawca_not_contain">
+       <property name="text">
+        <string>Nie zawiera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_sprzedawca_different">
+       <property name="text">
+        <string>Różny</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QWidget" name="verticalLayoutWidget_12">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>610</y>
+      <width>160</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="lyt_numer_konta_radio_btn">
+     <item>
+      <widget class="QRadioButton" name="radioButton_nr_konta_contain">
+       <property name="text">
+        <string>Zawiera</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_nr_konta_equal">
+       <property name="text">
+        <string>Równy</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_nr_konta_start_on">
+       <property name="text">
+        <string>Zaczyna się od</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="radioButton_nr_konta_end_on">
+       <property name="text">
+        <string>Kończy się na</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -92,8 +757,10 @@
     <bool>false</bool>
    </attribute>
    <addaction name="action_faktury_Dodaj_FV"/>
+   <addaction name="action_faktury_open_pdf"/>
+   <addaction name="action_faktury_zaplac"/>
    <addaction name="separator"/>
-   <addaction name="action_wyszukiwanie_ZnajdzFV"/>
+   <addaction name="action_wyszukiwanie_search"/>
    <addaction name="separator"/>
    <addaction name="action_wyswietlanie_Wszystkie"/>
    <addaction name="action_wyswietlanie_Nieoplacone"/>
@@ -107,7 +774,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>895</width>
+     <width>793</width>
      <height>18</height>
     </rect>
    </property>
@@ -116,12 +783,14 @@
      <string>Faktury</string>
     </property>
     <addaction name="action_faktury_Dodaj_FV"/>
+    <addaction name="action_faktury_open_pdf"/>
+    <addaction name="action_faktury_zaplac"/>
    </widget>
    <widget class="QMenu" name="menuWyszukiwanie">
     <property name="title">
      <string>Wyszukiwanie</string>
     </property>
-    <addaction name="action_wyszukiwanie_ZnajdzFV"/>
+    <addaction name="action_wyszukiwanie_search"/>
    </widget>
    <widget class="QMenu" name="menuSortowanie">
     <property name="title">
@@ -162,13 +831,19 @@
     <string>Dodaj FV</string>
    </property>
   </action>
-  <action name="action_wyszukiwanie_ZnajdzFV">
+  <action name="action_wyszukiwanie_search">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset>
      <normaloff>../ikony/find.png</normaloff>../ikony/find.png</iconset>
    </property>
    <property name="text">
-    <string>Znajdź FV</string>
+    <string>Szukaj FV</string>
    </property>
   </action>
   <action name="action_sortowanie_Data_wystawienia">
@@ -301,6 +976,24 @@
    </property>
    <property name="text">
     <string>Numer konta bankowego</string>
+   </property>
+  </action>
+  <action name="action_faktury_zaplac">
+   <property name="icon">
+    <iconset>
+     <normaloff>../ikony/pay.png</normaloff>../ikony/pay.png</iconset>
+   </property>
+   <property name="text">
+    <string>Zapłać</string>
+   </property>
+  </action>
+  <action name="action_faktury_open_pdf">
+   <property name="icon">
+    <iconset>
+     <normaloff>../ikony/open.png</normaloff>../ikony/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>Otwórz</string>
    </property>
   </action>
  </widget>

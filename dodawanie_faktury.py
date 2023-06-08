@@ -57,10 +57,9 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
             float(
                 self.lineedit_kwota_netto.text().replace(",", ".")
             )  # zamiana przecinka na kropkę
-            if (
-                len(self.lineedit_kwota_netto.text().replace(",", ".").split(".")[-1])
-                > 2
-            ):
+            if len(
+                self.lineedit_kwota_netto.text().replace(",", ".").split(".")[-1]
+            ) > 2 or "." not in self.lineedit_kwota_netto.text().replace(",", "."):
                 errors.append(
                     "Kwota netto musi mieć maksymalnie 2 miejsca po przecinku"
                 )
@@ -75,14 +74,21 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
             float(
                 self.lineedit_kwota_brutto.text().replace(",", ".")
             )  # zamiana przecinka na kropkę
-            if (
-                len(self.lineedit_kwota_brutto.text().replace(",", ".").split(".")[-1])
-                > 2
-            ):
+            if len(
+                self.lineedit_kwota_brutto.text().replace(",", ".").split(".")[-1]
+            ) > 2 or "." not in self.lineedit_kwota_brutto.text().replace(",", "."):
                 errors.append(
                     "Kwota brutto musi mieć maksymalnie 2 miejsca po przecinku"
                 )
                 self.lineedit_kwota_brutto.setStyleSheet(wrong_input_style())
+
+            if float(self.lineedit_kwota_brutto.text().replace(",", ".")) < float(
+                self.lineedit_kwota_netto.text().replace(",", ".")
+            ):
+                errors.append("Kwota brutto nie może być mniejsza od kwoty netto")
+                self.lineedit_kwota_brutto.setStyleSheet(wrong_input_style())
+                self.lineedit_kwota_netto.setStyleSheet(wrong_input_style())
+
         except ValueError:
             errors.append("Kwota brutto musi być liczbą")
             self.lineedit_kwota_brutto.setStyleSheet(wrong_input_style())
@@ -102,72 +108,68 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
     def evt_dodaj(self):
         if self.check_parametrs():
             # add to database
-            self.db = QSqlDatabase.addDatabase("QSQLITE")
-            path = os.path.join(os.path.dirname(__file__), "data", "fv.db")
-            self.db.setDatabaseName(path)
-            if self.db.open():
-                self.query = QSqlQuery()
+            if not QSqlDatabase.database().isValid():
+                self.db = QSqlDatabase.addDatabase("QSQLITE")
+                path = os.path.join(os.path.dirname(__file__), "data", "fv.db")
+                self.db.setDatabaseName(path)
+                self.db.open()
+            else:
+                self.db = QSqlDatabase.database()
+            self.query = QSqlQuery()
 
-                self.query.exec("SELECT id FROM faktury ORDER BY id DESC LIMIT 1")
-                self.query.next()
-                id = self.query.value(0) + 1
-                file_name = "{}____{}.pdf".format(id, self.lineedit_numer_fv.text())
+            self.query.exec("SELECT id FROM faktury ORDER BY id DESC LIMIT 1")
+            self.query.next()
+            id = self.query.value(0) + 1
+            file_name = "{}____{}.pdf".format(id, self.lineedit_numer_fv.text())
 
-                self.query.prepare(
-                    "INSERT INTO faktury (data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES (:data_wystawienia, :numer_fv, :sprzedawca, :kwota_netto, :kwota_brutto, :numer_konta_bankowego, :status_fv, :termin_platnosci, :nazwa_pliku)"
+            self.query.prepare(
+                "INSERT INTO faktury (data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES (:data_wystawienia, :numer_fv, :sprzedawca, :kwota_netto, :kwota_brutto, :numer_konta_bankowego, :status_fv, :termin_platnosci, :nazwa_pliku)"
+            )
+            self.query.bindValue(
+                ":data_wystawienia",
+                self.dateEdit_data_wystawienia.date().toString("yyyy-MM-dd"),
+            )
+            self.query.bindValue(":numer_fv", self.lineedit_numer_fv.text())
+            self.query.bindValue(":sprzedawca", self.lineedit_sprzedawca.text())
+            self.query.bindValue(
+                ":kwota_netto",
+                float(self.lineedit_kwota_netto.text().replace(",", ".")),
+            )
+            self.query.bindValue(
+                ":kwota_brutto",
+                float(self.lineedit_kwota_brutto.text().replace(",", ".")),
+            )
+            self.query.bindValue(
+                ":numer_konta_bankowego", self.lineedit_numer_konta.text()
+            )
+            self.query.bindValue(":status_fv", self.comboBox.currentIndex())
+            self.query.bindValue(
+                ":termin_platnosci",
+                self.dateEdit_termin_platnosci.date().toString("yyyy-MM-dd"),
+            )
+            self.query.bindValue(
+                ":nazwa_pliku",
+                file_name,
+            )
+            if self.query.exec():
+                self.czy_dodano = True
+                QMessageBox.information(
+                    self,
+                    "Dodano",
+                    "Dodano fakturę",
+                    QMessageBox.StandardButton.Ok,
                 )
-                self.query.bindValue(
-                    ":data_wystawienia",
-                    self.dateEdit_data_wystawienia.date().toString("yyyy-MM-dd"),
+                # copy file to data folder
+                new_path = os.path.join(
+                    os.path.dirname(__file__), "data", "pdf", file_name
                 )
-                self.query.bindValue(":numer_fv", self.lineedit_numer_fv.text())
-                self.query.bindValue(":sprzedawca", self.lineedit_sprzedawca.text())
-                self.query.bindValue(
-                    ":kwota_netto",
-                    float(self.lineedit_kwota_netto.text().replace(",", ".")),
-                )
-                self.query.bindValue(
-                    ":kwota_brutto",
-                    float(self.lineedit_kwota_brutto.text().replace(",", ".")),
-                )
-                self.query.bindValue(
-                    ":numer_konta_bankowego", self.lineedit_numer_konta.text()
-                )
-                self.query.bindValue(":status_fv", self.comboBox.currentIndex())
-                self.query.bindValue(
-                    ":termin_platnosci",
-                    self.dateEdit_termin_platnosci.date().toString("yyyy-MM-dd"),
-                )
-                self.query.bindValue(
-                    ":nazwa_pliku",
-                    file_name,
-                )
-                if self.query.exec():
-                    self.czy_dodano = True
-                    QMessageBox.information(
-                        self,
-                        "Dodano",
-                        "Dodano fakturę",
-                        QMessageBox.StandardButton.Ok,
-                    )
-                    # copy file to data folder
-                    new_path = os.path.join(
-                        os.path.dirname(__file__), "data", "pdf", file_name
-                    )
-                    shutil.copyfile(self.file_path, new_path)
+                shutil.copyfile(self.file_path, new_path)
 
-                else:
-                    QMessageBox.critical(
-                        self,
-                        "Błąd",
-                        "Nie udało się dodać faktury",
-                        QMessageBox.StandardButton.Ok,
-                    )
             else:
                 QMessageBox.critical(
                     self,
                     "Błąd",
-                    "Nie udało się otworzyć bazy danych",
+                    "Nie udało się dodać faktury",
                     QMessageBox.StandardButton.Ok,
                 )
 
