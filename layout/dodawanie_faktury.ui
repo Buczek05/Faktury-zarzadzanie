@@ -66,7 +66,7 @@
      </spacer>
     </item>
     <item>
-     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0" columnstretch="1,1">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="0,0,0,0,0,0,0,0,0,0,0" columnstretch="1,1">
       <property name="rightMargin">
        <number>10</number>
       </property>
@@ -105,12 +105,12 @@
        <widget class="QComboBox" name="comboBox">
         <item>
          <property name="text">
-          <string>Opłacona</string>
+          <string>Nieopłacona</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Nieopłacona</string>
+          <string>Opłacona</string>
          </property>
         </item>
        </widget>
@@ -235,12 +235,18 @@
         <property name="text">
          <string>Dodaj</string>
         </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QPushButton" name="anuluj">
         <property name="text">
          <string>Anuluj</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
         </property>
        </widget>
       </item>
