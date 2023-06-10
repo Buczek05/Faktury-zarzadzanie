@@ -6,6 +6,7 @@ from PyQt6.QtSql import *
 import os
 from dodawanie_faktury import Dodawanie_Faktury
 from placenie import Payment
+from datetime import datetime
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -28,6 +29,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sorting_ascending = True
         self.show_all_unpaid_paid = 0  # 0 - all, 1 - unpaid, 2 - paid
         self.sorting_column_name = "id"
+        self.search_clause_elements = []
 
         self.set_table_headers()
         self.setup_connection()
@@ -67,6 +69,169 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.checkBox_kwota_netto.stateChanged.connect(self.evt_kwota_netto)
         self.checkBox_kwota_brutto.stateChanged.connect(self.evt_kwota_brutto)
         self.checkBox_termin_platnosci.stateChanged.connect(self.evt_termin_platnosci)
+
+        self.btn_search.clicked.connect(self.evt_search_prepare_clause)
+        self.btn_clear_search.clicked.connect(self.evt_clear_search)
+
+    def evt_search_prepare_clause(self):
+        self.search_clause_elements = []
+        ###### DATA WYSTAWIENIA ######
+        if self.checkBox_data_wystawienia.isChecked():
+            date_from = self.dateEdit_data_wystawienia_od.date().toString("yyyy-MM-dd")
+            date_to = self.dateEdit_data_wystawienia_do.date().toString("yyyy-MM-dd")
+            if date_from != "2000-01-01" or date_to != QDate.currentDate().toString(
+                "yyyy-MM-dd"
+            ):
+                self.search_clause_elements.append(
+                    "data_wystawienia BETWEEN '{}' AND '{}'".format(date_from, date_to)
+                )
+        else:
+            date_specific = self.dateEdit_data_wystawienia_konkretna.date().toString(
+                "yyyy-MM-dd"
+            )
+            if date_specific != "2000-01-01":
+                self.search_clause_elements.append(
+                    "data_wystawienia = '{}'".format(date_specific)
+                )
+
+        ###### NUMER FV ######
+        if self.lineEdit_numer_fv.text() != "":
+            if self.radioButton_numer_FV_contain.isChecked():
+                clause = "numer_fv LIKE '%{}%'".format(self.lineEdit_numer_fv.text())
+            elif self.radioButton_numer_FV_not_contain.isChecked():
+                clause = "numer_fv NOT LIKE '%{}%'".format(
+                    self.lineEdit_numer_fv.text()
+                )
+            elif self.radioButton_numer_FV_equal.isChecked():
+                clause = "numer_fv = '{}'".format(self.lineEdit_numer_fv.text())
+            elif self.radioButton_numer_FV_different.isChecked():
+                clause = "numer_fv != '{}'".format(self.lineEdit_numer_fv.text())
+            self.search_clause_elements.append(clause)
+
+        ###### SPRZEDAWCA ######
+        if self.lineEdit_sprzedawca.text() != "":
+            if self.radioButton_sprzedawca_contain.isChecked():
+                clause = "sprzedawca LIKE '%{}%'".format(
+                    self.lineEdit_sprzedawca.text()
+                )
+            elif self.radioButton_sprzedawca_not_contain.isChecked():
+                clause = "sprzedawca NOT LIKE '%{}%'".format(
+                    self.lineEdit_sprzedawca.text()
+                )
+            elif self.radioButton_sprzedawca_equal.isChecked():
+                clause = "sprzedawca = '{}'".format(self.lineEdit_sprzedawca.text())
+            elif self.radioButton_sprzedawca_different.isChecked():
+                clause = "sprzedawca != '{}'".format(self.lineEdit_sprzedawca.text())
+            self.search_clause_elements.append(clause)
+
+        ###### KWOTA NETTO ######
+        if self.checkBox_kwota_netto.isChecked():
+            kwota_netto_from = self.doubleSpinBox_kwota_netto_od.value()
+            kwota_netto_to = self.doubleSpinBox_kwota_netto_do.value()
+            if kwota_netto_from != 0 or kwota_netto_to != 0:
+                self.search_clause_elements.append(
+                    "kwota_netto BETWEEN {} AND {}".format(
+                        kwota_netto_from, kwota_netto_to
+                    )
+                )
+        else:
+            kwota_netto_specific = self.doubleSpinBox_kwota_netto_konkretna.value()
+            if kwota_netto_specific != 0:
+                self.search_clause_elements.append(
+                    "kwota_netto = {}".format(kwota_netto_specific)
+                )
+
+        ###### KWOTA BRUTTO ######
+        if self.checkBox_kwota_brutto.isChecked():
+            kwota_brutto_from = self.doubleSpinBox_kwota_brutto_od.value()
+            kwota_brutto_to = self.doubleSpinBox_kwota_brutto_do.value()
+            if kwota_brutto_from != 0 or kwota_brutto_to != 0:
+                self.search_clause_elements.append(
+                    "kwota_brutto BETWEEN {} AND {}".format(
+                        kwota_brutto_from, kwota_brutto_to
+                    )
+                )
+        else:
+            kwota_brutto_specific = self.doubleSpinBox_kwota_brutto_konkretna.value()
+            if kwota_brutto_specific != 0:
+                self.search_clause_elements.append(
+                    "kwota_brutto = {}".format(kwota_brutto_specific)
+                )
+
+        ###### NUMER KONTA ######
+        if self.lineEdit_nr_konta.text() != "":
+            if self.radioButton_nr_konta_contain.isChecked():
+                clause = "nr_konta LIKE '%{}%'".format(self.lineEdit_nr_konta.text())
+            elif self.radioButton_nr_konta_not_contain.isChecked():
+                clause = "nr_konta NOT LIKE '%{}%'".format(
+                    self.lineEdit_nr_konta.text()
+                )
+            elif self.radioButton_nr_konta_equal.isChecked():
+                clause = "nr_konta = '{}'".format(self.lineEdit_nr_konta.text())
+            elif self.radioButton_nr_konta_different.isChecked():
+                clause = "nr_konta != '{}'".format(self.lineEdit_nr_konta.text())
+            self.search_clause_elements.append(clause)
+
+        ###### TERMIN PLATNOSCI ######
+        if self.checkBox_termin_platnosci.isChecked():
+            pay_date_from = self.dateEdit_termin_platnosci_od.date().toString(
+                "yyyy-MM-dd"
+            )
+            pay_date_to = self.dateEdit_termin_platnosci_do.date().toString(
+                "yyyy-MM-dd"
+            )
+            if (
+                pay_date_from != "2000-01-01"
+                or pay_date_to != QDate.currentDate().toString("yyyy-MM-dd")
+            ):
+                self.search_clause_elements.append(
+                    "termin_platnosci BETWEEN '{}' AND '{}'".format(
+                        pay_date_from, pay_date_to
+                    )
+                )
+        else:
+            pay_date_specific = (
+                self.dateEdit_termin_platnosci_konkretna.date().toString("yyyy-MM-dd")
+            )
+            if pay_date_specific != "2000-01-01":
+                self.search_clause_elements.append(
+                    "termin_platnosci = '{}'".format(pay_date_specific)
+                )
+
+        self.populating_table()
+
+    def evt_clear_search(self):
+        self.checkBox_data_wystawienia.setChecked(True)
+        self.checkBox_kwota_netto.setChecked(True)
+        self.checkBox_kwota_brutto.setChecked(True)
+        self.checkBox_termin_platnosci.setChecked(True)
+
+        self.radioButton_numer_FV_contain.setChecked(True)
+        self.radioButton_sprzedawca_contain.setChecked(True)
+        self.radioButton_nr_konta_contain.setChecked(True)
+
+        self.lineEdit_numer_fv.setText("")
+        self.lineEdit_sprzedawca.setText("")
+        self.lineEdit_nr_konta.setText("")
+
+        self.dateEdit_data_wystawienia_konkretna.setDate(QDate(0, 0, 0))
+        self.dateEdit_data_wystawienia_od.setDate(QDate(0, 0, 0))
+        self.dateEdit_data_wystawienia_do.setDate(QDate.currentDate())
+
+        self.doubleSpinBox_kwota_netto_konkretna.setValue(0)
+        self.doubleSpinBox_kwota_netto_od.setValue(0)
+        self.doubleSpinBox_kwota_netto_do.setValue(0)
+
+        self.doubleSpinBox_kwota_brutto_konkretna.setValue(0)
+        self.doubleSpinBox_kwota_brutto_od.setValue(0)
+        self.doubleSpinBox_kwota_brutto_do.setValue(0)
+
+        self.dateEdit_termin_platnosci_konkretna.setDate(QDate(0, 0, 0))
+        self.dateEdit_termin_platnosci_od.setDate(QDate(0, 0, 0))
+        self.dateEdit_termin_platnosci_do.setDate(QDate.currentDate())
+
+        self.search_clause_elements = []
+        self.populating_table()
 
     def evt_date_wystawienia(self, checked):
         self.dateEdit_data_wystawienia_konkretna.setVisible(not checked)
@@ -149,14 +314,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setRowCount(0)
         self.tableWidget.clearContents()
         # Create a query to select the data.
-
+        elements = []
+        elements.extend(self.search_clause_elements)
         match self.show_all_unpaid_paid:
-            case 0:
-                where_clause = ""
             case 1:
-                where_clause = "WHERE status_fv = 0"
+                elements.append("status_fv = 0")
             case 2:
-                where_clause = "WHERE status_fv = 1"
+                elements.append("status_fv = 1")
+        if len(elements) > 0:
+            where_clause = "WHERE " + " AND ".join(elements)
+        else:
+            where_clause = ""
+        print(where_clause)
 
         self.query = QSqlQuery()
         self.query.exec(
@@ -404,31 +573,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.populating_table()
 
     def evt_sort_default(self):
-        self.evt_sort_column_clicked(-1)
+        self.sorting(-1)
 
     def evt_sort_data_wystawienia(self):
-        self.evt_sort_column_clicked(0)
+        self.sorting(0)
 
     def evt_sort_numer_fv(self):
-        self.evt_sort_column_clicked(1)
+        self.sorting(1)
 
     def evt_sort_sprzedawca(self):
-        self.evt_sort_column_clicked(2)
+        self.sorting(2)
 
     def evt_sort_kwota_netto(self):
-        self.evt_sort_column_clicked(3)
+        self.sorting(3)
 
     def evt_sort_kwota_brutto(self):
-        self.evt_sort_column_clicked(4)
+        self.sorting(4)
 
     def evt_sort_bank_account_number(self):
-        self.evt_sort_column_clicked(5)
+        self.sorting(5)
 
     def evt_sort_status_fv(self):
-        self.evt_sort_column_clicked(6)
+        self.sorting(6)
 
     def evt_sort_termin_platnosci(self):
-        self.evt_sort_column_clicked(7)
+        self.sorting(7)
 
     def evt_sort_descending(self):
         if self.sorting_ascending == True:

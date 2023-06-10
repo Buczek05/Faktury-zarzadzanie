@@ -29,7 +29,7 @@
       <height>101</height>
      </rect>
     </property>
-    <layout class="QVBoxLayout" name="lyt_main" stretch="">
+    <layout class="QVBoxLayout" name="lyt_main">
      <property name="leftMargin">
       <number>5</number>
      </property>
@@ -49,8 +49,8 @@
      <rect>
       <x>10</x>
       <y>100</y>
-      <width>659</width>
-      <height>137</height>
+      <width>785</width>
+      <height>162</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="filers_and_buttons">
@@ -268,7 +268,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_od"/>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_od">
+             <property name="maximum">
+              <double>99999999999.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -292,12 +296,20 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_do"/>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_do">
+             <property name="maximum">
+              <double>99999999999.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_konkretna"/>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_netto_konkretna">
+           <property name="maximum">
+            <double>99999999999.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_2">
@@ -366,7 +378,11 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_od"/>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_od">
+             <property name="maximum">
+              <double>99999999999.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
@@ -390,12 +406,20 @@
             </widget>
            </item>
            <item>
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_do"/>
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_do">
+             <property name="maximum">
+              <double>99999999999.000000000000000</double>
+             </property>
+            </widget>
            </item>
           </layout>
          </item>
          <item>
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_konkretna"/>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_kwota_brutto_konkretna">
+           <property name="maximum">
+            <double>99999999999.000000000000000</double>
+           </property>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_3">
@@ -618,7 +642,7 @@
       <x>10</x>
       <y>600</y>
       <width>160</width>
-      <height>80</height>
+      <height>92</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="lyt_numer_FV_radio_btn">
@@ -661,7 +685,7 @@
       <x>190</x>
       <y>600</y>
       <width>160</width>
-      <height>80</height>
+      <height>92</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="lyt_sprzedawca_radio_btn">
@@ -704,7 +728,7 @@
       <x>370</x>
       <y>610</y>
       <width>160</width>
-      <height>80</height>
+      <height>92</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="lyt_numer_konta_radio_btn">
@@ -775,7 +799,7 @@
      <x>0</x>
      <y>0</y>
      <width>793</width>
-     <height>18</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFaktury">
