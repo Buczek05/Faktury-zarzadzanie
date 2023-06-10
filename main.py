@@ -263,6 +263,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     ### SQL ###
     def create_db_file_and_table_if_not_exists(self):
+        ### FOLDER FOR PDF FILES ###
+        if not os.path.exists(os.path.join(os.path.dirname(__file__), "data", "pdf")):
+            os.makedirs(os.path.join(os.path.dirname(__file__), "data", "pdf"))
+
         self.db = QSqlDatabase.addDatabase("QSQLITE")
         path = os.path.join(os.path.dirname(__file__), "data", "fv.db")
         self.db.setDatabaseName(path)
@@ -283,19 +287,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     nazwa_pliku TEXT
                     )"""  ### status_fv - 0 - nieopłacona, 1 - opłacona
                 )
-                # test data
-                self.query.exec(
-                    """INSERT INTO faktury (data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES ('2021-01-01', '1/2021', 'Jan Kowalski', 100, 123, '123456789', 0, '2021-01-31', 'test.pdf')"""
-                )
-                self.query.exec(
-                    """INSERT INTO faktury (data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES ('2021-02-01', '2/2021', 'Jan Kowalski', 200, 246, '123456789', 1, '2021-02-28', 'test.pdf')"""
-                )
-                self.query.exec(
-                    """INSERT INTO faktury (data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES ('2021-03-01', '3/2021', 'Jan Kowalski', 300, 369, '123456789', 0, '2021-03-31', 'test.pdf')"""
-                )
-                self.query.exec(
-                    """INSERT INTO faktury (data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES ('2021-02-01', '2/2021', 'Jan Kowalski', 200, 246, '123456789', 1, '2021-02-28', 'test.pdf')"""
-                )  # TODO: remove test data
                 print(self.query.lastError().text())
         else:
             QMessageBox.critical(
@@ -304,10 +295,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 "Nie udało się otworzyć bazy danych",
                 QMessageBox.StandardButton.Ok,
             )
-
-        ### FOLDER FOR PDF FILES ###
-        if not os.path.exists(os.path.join(os.path.dirname(__file__), "data", "pdf")):
-            os.makedirs(os.path.join(os.path.dirname(__file__), "data", "pdf"))
 
     def populating_table(self):
         # Clear the table.
