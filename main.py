@@ -161,15 +161,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ###### NUMER KONTA ######
         if self.lineEdit_nr_konta.text() != "":
             if self.radioButton_nr_konta_contain.isChecked():
-                clause = "nr_konta LIKE '%{}%'".format(self.lineEdit_nr_konta.text())
-            elif self.radioButton_nr_konta_not_contain.isChecked():
-                clause = "nr_konta NOT LIKE '%{}%'".format(
+                clause = "numer_konta_bankowego LIKE '%{}%'".format(
                     self.lineEdit_nr_konta.text()
                 )
             elif self.radioButton_nr_konta_equal.isChecked():
-                clause = "nr_konta = '{}'".format(self.lineEdit_nr_konta.text())
-            elif self.radioButton_nr_konta_different.isChecked():
-                clause = "nr_konta != '{}'".format(self.lineEdit_nr_konta.text())
+                clause = "numer_konta_bankowego = '{}'".format(
+                    self.lineEdit_nr_konta.text()
+                )
+            elif self.radioButton_nr_konta_start_on.isChecked():
+                clause = "numer_konta_bankowego LIKE '{}%'".format(
+                    self.lineEdit_nr_konta.text()
+                )
+            elif self.radioButton_nr_konta_end_on.isChecked():
+                clause = "numer_konta_bankowego LIKE '%{}'".format(
+                    self.lineEdit_nr_konta.text()
+                )
             self.search_clause_elements.append(clause)
 
         ###### TERMIN PLATNOSCI ######

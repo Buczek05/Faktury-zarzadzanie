@@ -10,6 +10,9 @@ def wrong_input_style():
         QLineEdit{
             border: 2px solid red;
         }
+        QDateEdit{
+            border: 2px solid red;
+        }
         """
 
 
@@ -42,6 +45,8 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
         self.lineedit_kwota_netto.setStyleSheet("")
         self.lineedit_kwota_brutto.setStyleSheet("")
         self.lineEdit_file_name.setStyleSheet("")
+        self.dateEdit_termin_platnosci.setStyleSheet("")
+        self.dateEdit_termin_platnosci.setStyleSheet("")
         errors = []
 
         if not self.lineedit_numer_fv.text():
@@ -59,7 +64,7 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
             )  # zamiana przecinka na kropkę
             if len(
                 self.lineedit_kwota_netto.text().replace(",", ".").split(".")[-1]
-            ) > 2 or "." not in self.lineedit_kwota_netto.text().replace(",", "."):
+            ) > 2 and "." in self.lineedit_kwota_netto.text().replace(",", "."):
                 errors.append(
                     "Kwota netto musi mieć maksymalnie 2 miejsca po przecinku"
                 )
@@ -76,7 +81,7 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
             )  # zamiana przecinka na kropkę
             if len(
                 self.lineedit_kwota_brutto.text().replace(",", ".").split(".")[-1]
-            ) > 2 or "." not in self.lineedit_kwota_brutto.text().replace(",", "."):
+            ) > 2 and "." in self.lineedit_kwota_brutto.text().replace(",", "."):
                 errors.append(
                     "Kwota brutto musi mieć maksymalnie 2 miejsca po przecinku"
                 )
@@ -88,10 +93,18 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
                 errors.append("Kwota brutto nie może być mniejsza od kwoty netto")
                 self.lineedit_kwota_brutto.setStyleSheet(wrong_input_style())
                 self.lineedit_kwota_netto.setStyleSheet(wrong_input_style())
-
         except ValueError:
             errors.append("Kwota brutto musi być liczbą")
             self.lineedit_kwota_brutto.setStyleSheet(wrong_input_style())
+        if (
+            self.dateEdit_data_wystawienia.date()
+            > self.dateEdit_termin_platnosci.date()
+        ):
+            errors.append(
+                "Data wystawienia nie może być późniejsza niż termin płatności"
+            )
+            self.dateEdit_termin_platnosci.setStyleSheet(wrong_input_style())
+            self.dateEdit_data_wystawienia.setStyleSheet(wrong_input_style())
         if not self.file_path:
             errors.append("Nie wybrano pliku")
             self.lineEdit_file_name.setStyleSheet(wrong_input_style())
@@ -119,7 +132,10 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
 
             self.query.exec("SELECT id FROM faktury ORDER BY id DESC LIMIT 1")
             self.query.next()
-            id = self.query.value(0) + 1
+            try:
+                id = self.query.value(0) + 1
+            except:
+                id = 1
             file_name = "{}____{}.pdf".format(id, self.lineedit_numer_fv.text())
 
             self.query.prepare(
