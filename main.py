@@ -274,7 +274,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             os.makedirs(os.path.join(os.path.dirname(__file__), "data", "pdf"))
 
         self.db = QSqlDatabase.addDatabase("QSQLITE")
-        path = os.path.join(os.path.dirname(__file__), "data", "fv.db")
+        path = os.path.join(os.path.dirname(__file__), "data", "database.db")
         self.db.setDatabaseName(path)
         if self.db.open():
             if "faktury" not in self.db.tables():

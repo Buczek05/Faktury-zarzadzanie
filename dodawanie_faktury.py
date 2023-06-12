@@ -123,7 +123,7 @@ class Dodawanie_Faktury(QDialog, Ui_Dialog):
             # add to database
             if not QSqlDatabase.database().isValid():
                 self.db = QSqlDatabase.addDatabase("QSQLITE")
-                path = os.path.join(os.path.dirname(__file__), "data", "fv.db")
+                path = os.path.join(os.path.dirname(__file__), "data", "database.db")
                 self.db.setDatabaseName(path)
                 self.db.open()
             else:

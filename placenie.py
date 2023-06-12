@@ -21,7 +21,7 @@ class Payment(QDialog, Ui_Dialog):
     def setup_data(self):
         if not QSqlDatabase.database().isValid():
             self.db = QSqlDatabase.addDatabase("QSQLITE")
-            path = os.path.join(os.path.dirname(__file__), "data", "fv.db")
+            path = os.path.join(os.path.dirname(__file__), "data", "database.db")
             self.db.setDatabaseName(path)
             self.db.open()
         else:
