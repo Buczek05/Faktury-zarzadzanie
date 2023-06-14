@@ -799,7 +799,7 @@
      <x>0</x>
      <y>0</y>
      <width>793</width>
-     <height>22</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFaktury">
@@ -809,6 +809,9 @@
     <addaction name="action_faktury_Dodaj_FV"/>
     <addaction name="action_faktury_open_pdf"/>
     <addaction name="action_faktury_zaplac"/>
+    <addaction name="separator"/>
+    <addaction name="action_faktury_edit"/>
+    <addaction name="action_faktury_delete"/>
    </widget>
    <widget class="QMenu" name="menuWyszukiwanie">
     <property name="title">
@@ -1018,6 +1021,16 @@
    </property>
    <property name="text">
     <string>Otwórz</string>
+   </property>
+  </action>
+  <action name="action_faktury_edit">
+   <property name="text">
+    <string>Edytuj</string>
+   </property>
+  </action>
+  <action name="action_faktury_delete">
+   <property name="text">
+    <string>Usuń</string>
    </property>
   </action>
  </widget>

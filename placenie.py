@@ -28,7 +28,12 @@ class Payment(QDialog, Ui_Dialog):
             self.db = QSqlDatabase.database()
         self.query = QSqlQuery()
 
-        self.query.exec("SELECT * FROM faktury WHERE id = {}".format(self.id))
+        self.query.exec(
+            "SELECT faktury.id, id_sprzedawcy, status_fv, nazwa as sprzedawca, numer_fv, numer_konta_bankowego, kwota_brutto, nazwa_pliku FROM faktury LEFT JOIN sprzedawcy ON id_sprzedawcy = sprzedawcy.id WHERE faktury.id = {}".format(
+                self.id
+            )
+        )
+
         self.query.next()
 
         if self.query.value("status_fv") == 1:

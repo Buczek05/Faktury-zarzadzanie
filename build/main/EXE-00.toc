@@ -87,7 +87,7 @@
  [],
  False,
  False,
- 1686557193,
+ 1686563238,
  [('runw.exe',
    'C:\\Users\\kacpe\\.pyenv\\pyenv-win\\versions\\3.11.1\\Lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\runw.exe',
    'EXECUTABLE')])

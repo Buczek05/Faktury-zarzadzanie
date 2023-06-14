@@ -3,8 +3,10 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 from PyQt6.QtSql import *
-import os
-from dodawanie_faktury import Dodawanie_Faktury
+import os, time
+from dodawanie_faktury import Dodawanie_Edytowanie_Faktury
+from remember_system import Remember_system, Worker_wait_x_min
+from nieoplacone import Nieoplacone
 from placenie import Payment
 from datetime import datetime
 
@@ -24,16 +26,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.lyt_main.addWidget(self.tableWidget, 5)
         self.centralwidget.setLayout(self.lyt_main)
         self.widget_filters.setVisible(False)
+        self.tableWidget.setAlternatingRowColors(True)
 
         self.sort_index = -1
         self.sorting_ascending = True
         self.show_all_unpaid_paid = 0  # 0 - all, 1 - unpaid, 2 - paid
-        self.sorting_column_name = "id"
+        self.sorting_column_name = "faktury.id"
         self.search_clause_elements = []
 
         self.set_table_headers()
-        self.setup_connection()
         self.create_db_file_and_table_if_not_exists()
+        self.setup_connection()
         self.populating_table()
         self.setup_searching_lyts()
         self.connect_serching_everything()
@@ -284,16 +287,28 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     data_wystawienia TEXT,
                     numer_fv TEXT,
-                    sprzedawca TEXT,
+                    id_sprzedawcy INTEGER,
                     kwota_netto REAL,
                     kwota_brutto REAL,
                     numer_konta_bankowego TEXT,
                     status_fv BOOLEAN, 
                     termin_platnosci TEXT,
-                    nazwa_pliku TEXT
+                    nazwa_pliku TEXT,
+                    deleted BOOLEAN DEFAULT 0
                     )"""  ### status_fv - 0 - nieopłacona, 1 - opłacona
                 )
                 print(self.query.lastError().text())
+            if "sprzedawcy" not in self.db.tables():
+                self.query = QSqlQuery()
+                self.query.exec(
+                    """CREATE TABLE IF NOT EXISTS sprzedawcy (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nazwa TEXT,
+                    nr_konta TEXT
+                    )"""
+                )
+                print(self.query.lastError().text())
+
         else:
             QMessageBox.critical(
                 self,
@@ -307,7 +322,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setRowCount(0)
         self.tableWidget.clearContents()
         # Create a query to select the data.
-        elements = []
+        elements = ["deleted = 0"]
         elements.extend(self.search_clause_elements)
         match self.show_all_unpaid_paid:
             case 1:
@@ -318,21 +333,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             where_clause = "WHERE " + " AND ".join(elements)
         else:
             where_clause = ""
-        print(where_clause)
 
         self.query = QSqlQuery()
+        self.query.exec("SELECT id, nazwa FROM sprzedawcy")
+        my_sellers_dict = {}
+        while self.query.next():
+            my_sellers_dict[self.query.value(0)] = self.query.value(1)
         self.query.exec(
-            "SELECT id, data_wystawienia, numer_fv, sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci FROM faktury {} ORDER BY {} {}".format(
+            "SELECT faktury.id, data_wystawienia, numer_fv, nazwa as sprzedawca, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci FROM faktury LEFT JOIN sprzedawcy ON faktury.id_sprzedawcy = sprzedawcy.id {} ORDER BY {} {}".format(
                 where_clause,
                 self.sorting_column_name,
                 "ASC" if self.sorting_ascending else "DESC",
             )
         )
+        print(self.query.lastError().text())
         # Populate the table.
         while self.query.next():
             row = self.tableWidget.rowCount()
             self.tableWidget.insertRow(row)
             for col in range(8):
+                if col == 2:
+                    self.tableWidget.setItem(
+                        row,
+                        col,
+                        QTableWidgetItem(self.query.value("sprzedawca")),
+                    )
+                    continue
                 if col == 6:
                     self.tableWidget.setItem(
                         row,
@@ -347,13 +373,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 )
 
     def finding_current_row_fv_data(self):
+        if self.tableWidget.currentRow() == -1:
+            return
         row = self.tableWidget.currentRow()
         self.query.prepare(
-            "SELECT * from faktury WHERE data_wystawienia = :data_wystawienia AND numer_fv = :numer_fv AND Sprzedawca = :sprzedawca AND kwota_netto = :kwota_netto AND kwota_brutto = :kwota_brutto AND numer_konta_bankowego = :numer_konta_bankowego AND termin_platnosci = :termin_platnosci"
+            "SELECT * from faktury WHERE data_wystawienia = :data_wystawienia AND numer_fv = :numer_fv AND kwota_netto = :kwota_netto AND kwota_brutto = :kwota_brutto AND numer_konta_bankowego = :numer_konta_bankowego AND termin_platnosci = :termin_platnosci"
         )
         self.query.bindValue(":data_wystawienia", self.tableWidget.item(row, 0).text())
         self.query.bindValue(":numer_fv", self.tableWidget.item(row, 1).text())
-        self.query.bindValue(":sprzedawca", self.tableWidget.item(row, 2).text())
         self.query.bindValue(
             ":kwota_netto", float(self.tableWidget.item(row, 3).text())
         )
@@ -371,11 +398,20 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     ### SETUP CONNECTIONS ###
     def setup_connection(self):
+        # REMEMBERS SYSTEM CONNECTIONS
+
+        self.remember_system = Remember_system()
+        self.remember_system.start()
+        self.remember_system.show_not_paid.connect(self.show_not_paid)
+        self.remember_system.get_data_not_paid_info.connect(self.set_not_paid_info)
+
         # ACTION CLICK CONNECTIONS
 
         self.action_faktury_Dodaj_FV.triggered.connect(self.evt_add_fv)
         self.action_faktury_open_pdf.triggered.connect(self.open_pdf_file)
         self.action_faktury_zaplac.triggered.connect(self.pay_for_invoice)
+        self.action_faktury_edit.triggered.connect(self.evt_edit_invoice)
+        self.action_faktury_delete.triggered.connect(self.evt_delete_invoice)
 
         self.action_wyszukiwanie_search.triggered.connect(self.evt_search_fv)
 
@@ -441,7 +477,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def get_column_sql_name(self, index):
         match index:
             case -1:
-                return "id"
+                return "faktury.id"
             case 0:
                 return "data_wystawienia"
             case 1:
@@ -484,6 +520,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def pay_for_invoice(self):
         data = self.finding_current_row_fv_data()
+        if not data:
+            return
         if data.value("status_fv") == 0:
             paymant = Payment(data.value("id"))
             paymant.exec()
@@ -498,7 +536,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             )
 
     def open_pdf_file(self):
-        file = self.finding_current_row_fv_data().value("nazwa_pliku")
+        data = self.finding_current_row_fv_data()
+        if not data:
+            return
+        file = data.value("nazwa_pliku")
         if ".pdf" in file:
             file = os.path.join(os.path.dirname(__file__), "data", "pdf", file)
             try:
@@ -517,6 +558,64 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 "Nie można otworzyć pliku. Plik nie jest w formacie PDF lub jest pusty",
                 QMessageBox.StandardButton.Ok,
             )
+
+    def evt_edit_invoice(self):
+        data = self.finding_current_row_fv_data()
+        edit = Dodawanie_Edytowanie_Faktury(data.value("id"))
+        edit.exec()
+        self.populating_table()
+
+    def evt_delete_invoice(self):
+        data = self.finding_current_row_fv_data()
+        usun = QMessageBox()
+        usun.setWindowTitle("Usuwanie faktury")
+        usun.setText("Czy na pewno chcesz usunąć fakturę?")
+        usun.addButton("Tak", QMessageBox.ButtonRole.YesRole)
+        usun.addButton("Nie", QMessageBox.ButtonRole.NoRole)
+        usun.exec()
+        if usun.clickedButton().text() == "Tak":
+            self.query.exec(
+                "UPDATE faktury SET deleted = 1 WHERE id = " + str(data.value("id"))
+            )
+            print(self.query.lastError().text())
+            self.populating_table()
+
+    def show_not_paid(self):
+        self.show_all_unpaid_paid = 1
+        self.populating_table()
+        self.show()
+        self.activateWindow()
+
+    def set_not_paid_info(self):
+        overdue = 0
+        today = 0
+        tommorow = 0
+        more_days = 0
+
+        self.query.exec(
+            "SELECT termin_platnosci FROM faktury WHERE deleted = 0 AND status_fv = 0"
+        )
+
+        while self.query.next():
+            if QDate.currentDate().toString("yyyy-MM-dd") > self.query.value(0):
+                overdue += 1
+            elif QDate.currentDate().toString("yyyy-MM-dd") == self.query.value(0):
+                today += 1
+            elif QDate.currentDate().addDays(1).toString(
+                "yyyy-MM-dd"
+            ) == self.query.value(0):
+                tommorow += 1
+            else:
+                more_days += 1
+        nieoplacone = Nieoplacone(overdue, today, tommorow, more_days)
+        nieoplacone.exec()
+        if nieoplacone.what_to_do == 1:
+            self.show_not_paid()
+        elif nieoplacone.what_to_do == 2:
+            self.wait = Worker_wait_x_min()
+            self.wait.time = 5
+            self.wait.start()
+            self.wait.waited_emit.connect(self.set_not_paid_info)
 
     ### EVENT HANDLERS - ACTION ###
     def unchecked_sort(self, index):
@@ -560,10 +659,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_wyswietlanie_Oplacone.setChecked(False)
 
     def evt_add_fv(self):
-        new_fv = Dodawanie_Faktury()
+        new_fv = Dodawanie_Edytowanie_Faktury()
         new_fv.exec()
-        if new_fv.czy_dodano:
-            self.populating_table()
+        self.populating_table()
 
     def evt_sort_default(self):
         self.sorting(-1)
