@@ -22,7 +22,7 @@ missing module named posix - imported by os (conditional, optional), posixpath (
 missing module named resource - imported by posix (top-level)
 missing module named _frozen_importlib_external - imported by importlib._bootstrap (delayed), importlib (optional), importlib.abc (optional), zipimport (top-level)
 excluded module named _frozen_importlib - imported by importlib (optional), importlib.abc (optional), zipimport (top-level)
-missing module named pyimod02_importers - imported by C:\Users\kacpe\.pyenv\pyenv-win\versions\3.11.1\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgutil.py (top-level)
+missing module named pyimod02_importers - imported by C:\Users\kacpe\.pyenv\pyenv-win\versions\3.11.2\Lib\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgutil.py (top-level)
 missing module named _scproxy - imported by urllib.request (conditional)
 missing module named termios - imported by getpass (optional)
 missing module named _posixsubprocess - imported by subprocess (conditional)

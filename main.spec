@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['main.py', 'nieoplacone.py', 'dodawanie_faktury.py', 'placenie.py', 'layout\\dodawanie_faktury_ui.py', 'layout\\main_window_ui.py', 'layout\\placenie_ui.py', 'layout\\nieoplacone_dialog_ui.py'],
+    ['main.py', 'nieoplacone.py', 'login.py', 'settings.py', 'dodawanie_faktury.py', 'placenie.py', 'layout\\login_ui.py', 'layout\\ustawienia_ui.py', 'layout\\dodawanie_faktury_ui.py', 'layout\\main_window_ui.py', 'layout\\placenie_ui.py', 'layout\\nieoplacone_dialog_ui.py'],
     pathex=[],
     binaries=[],
     datas=[],
