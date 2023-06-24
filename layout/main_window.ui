@@ -812,6 +812,8 @@
     <addaction name="separator"/>
     <addaction name="action_faktury_edit"/>
     <addaction name="action_faktury_delete"/>
+    <addaction name="separator"/>
+    <addaction name="action_faktury_settings"/>
    </widget>
    <widget class="QMenu" name="menuWyszukiwanie">
     <property name="title">
@@ -1031,6 +1033,11 @@
   <action name="action_faktury_delete">
    <property name="text">
     <string>Usuń</string>
+   </property>
+  </action>
+  <action name="action_faktury_settings">
+   <property name="text">
+    <string>Ustawienia</string>
    </property>
   </action>
  </widget>

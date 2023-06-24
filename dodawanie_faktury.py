@@ -282,7 +282,6 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
             message.addButton("Nie", QMessageBox.ButtonRole.NoRole)
             message.setIcon(QMessageBox.Icon.Warning)
             ret = message.exec()
-            print(ret)
             if ret == 0:
                 change = True
         if not nr_konta or change:
@@ -341,7 +340,6 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
                 "Nie udało się {} faktury".format(texts[1]),
                 QMessageBox.StandardButton.Ok,
             )
-            print(self.query.lastError().text())
 
     def evt_save_changes(self):
         if self.check_parametrs():
@@ -386,6 +384,6 @@ if __name__ == "__main__":
 
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
-    window = Dodawanie_Edytowanie_Faktury(1)
+    window = Dodawanie_Edytowanie_Faktury()
     window.show()
     sys.exit(app.exec())

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>369</width>
-    <height>270</height>
+    <width>519</width>
+    <height>351</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,7 +22,7 @@
      <height>251</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QVBoxLayout" name="main_layout">
     <item>
      <widget class="QTabWidget" name="ustawienia">
       <property name="currentIndex">
@@ -35,6 +35,80 @@
        <attribute name="title">
         <string>Powiadomienia</string>
        </attribute>
+       <widget class="QWidget" name="">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>331</width>
+          <height>221</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="powiadomienia_main_layout">
+         <item>
+          <widget class="QTableWidget" name="powiadomienia_table">
+           <column>
+            <property name="text">
+             <string>Pon</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Wto</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Śro</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Czw</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Pią</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Sob</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Nie</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>Godzina</string>
+            </property>
+           </column>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="powiadomienia_h_layout">
+           <item>
+            <widget class="QPushButton" name="powiadomienia_add">
+             <property name="text">
+              <string>Dodaj</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="powiadomienia_delete">
+             <property name="text">
+              <string>Usuń</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
       </widget>
       <widget class="QWidget" name="itd">
        <attribute name="title">
@@ -42,17 +116,6 @@
        </attribute>
       </widget>
      </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>PushButton</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </item>
    </layout>
   </widget>
