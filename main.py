@@ -39,7 +39,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sorting_column_name = "faktury.id"
         self.search_clause_elements = []
 
-        self.load_settings()
         self.setup_tray_icon()
         self.set_table_headers()
         self.create_db_file_and_table_if_not_exists()
