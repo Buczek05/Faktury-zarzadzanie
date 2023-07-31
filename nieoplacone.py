@@ -46,7 +46,9 @@ class Nieoplacone(QDialog, Ui_Dialog):
         self.zalegle.setText("Zaległe: " + str(self.overdue))
         self.dzisiaj.setText("Dzisiaj: " + str(self.today))
         self.jutro.setText("Jutro: " + str(self.tommorow))
-        self.pozniej.setText("Później: " + str(self.more_days))
+        self.pozniej.setText(
+            "Najbliższe płatności do 2 tygodni: " + str(self.more_days)
+        )
 
     def evt_ok(self):
         self.close()

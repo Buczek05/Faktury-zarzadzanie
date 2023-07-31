@@ -132,6 +132,11 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
         kwota_netto = self.lineedit_kwota_netto.text()
         try:
             self.lineedit_kwota_netto.setStyleSheet("")
+            if "," in kwota_netto:
+                kwota_netto = kwota_netto.replace(",", ".")
+            if kwota_netto.count(".") > 1:
+                a = kwota_netto.split(".")
+                kwota_netto = a[0] + "." + a[1]
             kwota_netto = float(kwota_netto)
             if kwota_netto < 0:
                 raise Exception
@@ -170,7 +175,6 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
         self.lineedit_sprzedawca.setStyleSheet("")
         self.lineedit_kwota_netto.setStyleSheet("")
         self.lineedit_kwota_brutto.setStyleSheet("")
-        self.lineEdit_file_name.setStyleSheet("")
         self.dateEdit_termin_platnosci.setStyleSheet("")
         self.dateEdit_termin_platnosci.setStyleSheet("")
         errors = []
@@ -231,9 +235,6 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
             )
             self.dateEdit_termin_platnosci.setStyleSheet(wrong_input_style())
             self.dateEdit_data_wystawienia.setStyleSheet(wrong_input_style())
-        if not self.file_path:
-            errors.append("Nie wybrano pliku")
-            self.lineEdit_file_name.setStyleSheet(wrong_input_style())
         if errors:
             msg = QMessageBox()
             msg.setIcon(QMessageBox.Icon.Critical)
@@ -249,8 +250,7 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
             "SELECT id, nr_konta FROM sprzedawcy WHERE nazwa = '{}'".format(
                 self.lineedit_sprzedawca.text()
             )
-        )
-        # check if sprzedawca is in database
+        )  # check if sprzedawca is in database
         if not self.query.next():
             self.query.prepare(
                 "INSERT INTO sprzedawcy (nazwa, nr_konta) VALUES (:nazwa, :nr_konta)"
@@ -264,10 +264,12 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
                 )
             )
             self.query.next()
+            id_sprzedawcy = self.query.value("id")
+            nr_konta = self.query.value("nr_konta")
         else:
-            self.check_nr_konta(self.query.value(1), self.query.value(0))
-        id_sprzedawcy = self.query.value(0)
-        nr_konta = self.query.value(1)
+            id_sprzedawcy = self.query.value("id")
+            nr_konta = self.query.value("nr_konta")
+            self.check_nr_konta(nr_konta, id_sprzedawcy)
         return id_sprzedawcy, nr_konta
 
     def check_nr_konta(self, nr_konta, id_sprzedawcy):
@@ -332,7 +334,6 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
                 "{} fakturę".format(texts[0]),
                 QMessageBox.StandardButton.Ok,
             )
-            self.copy_file_to_data_folder(file_name)
         else:
             QMessageBox.critical(
                 self,
@@ -344,6 +345,7 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
     def evt_save_changes(self):
         if self.check_parametrs():
             id_sprzedawcy, nr_konta = self.get_id_and_nr_konta()
+            print(id_sprzedawcy)
             self.query.prepare(
                 "UPDATE faktury SET data_wystawienia = :data_wystawienia, numer_fv = :numer_fv, id_sprzedawcy = :id_sprzedawcy, kwota_netto = :kwota_netto, kwota_brutto = :kwota_brutto, numer_konta_bankowego = :numer_konta_bankowego, status_fv = :status_fv, termin_platnosci = :termin_platnosci WHERE id = :id"
             )
@@ -355,14 +357,18 @@ class Dodawanie_Edytowanie_Faktury(QDialog, Ui_Dialog):
     def evt_dodaj(self):
         if self.check_parametrs():
             id_sprzedawcy, nr_konta = self.get_id_and_nr_konta()
-
+            print(id_sprzedawcy, nr_konta)
             self.query.exec("SELECT id FROM faktury ORDER BY id DESC LIMIT 1")
             self.query.next()
             try:
                 id = self.query.value(0) + 1
             except:
                 id = 1
-            file_name = "id____{}.pdf".format(id)
+            if self.file_path:
+                file_name = "id____{}.pdf".format(id)
+                self.copy_file_to_data_folder(file_name)
+            else:
+                file_name = ""
 
             self.query.prepare(
                 "INSERT INTO faktury (data_wystawienia, numer_fv, id_sprzedawcy, kwota_netto, kwota_brutto, numer_konta_bankowego, status_fv, termin_platnosci, nazwa_pliku) VALUES (:data_wystawienia, :numer_fv, :id_sprzedawcy, :kwota_netto, :kwota_brutto, :numer_konta_bankowego, :status_fv, :termin_platnosci, :nazwa_pliku)"

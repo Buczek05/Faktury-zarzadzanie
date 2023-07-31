@@ -18,14 +18,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__()
         self.setupUi(self)
         self.setWindowTitle("Faktury")
-        self.resize(1030, 600)
+        self.resize(1050, 600)
         self.FONT = QFont("MS Shell Dlg 2", 9)
         self.setFont(self.FONT)
 
         self.widget_filters = QWidget()
         self.widget_filters.setLayout(self.filers_and_buttons)
-        self.lyt_main.addWidget(self.widget_filters, 0)
-        self.lyt_main.addWidget(self.tableWidget, 5)
+        self.lyt_faktury.addWidget(self.widget_filters, 0)
+        self.lyt_faktury.addWidget(self.tableWidget, 5)
+        self.Faktury.setLayout(self.lyt_faktury)
+        self.lyt_samochody.addWidget(self.table_cars, 5)
+        self.Samochody.setLayout(self.lyt_samochody)
         self.centralwidget.setLayout(self.lyt_main)
         self.widget_filters.setVisible(False)
         self.tableWidget.setAlternatingRowColors(True)
@@ -39,8 +42,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.sorting_column_name = "faktury.id"
         self.search_clause_elements = []
 
+        self.evt_tab_changed(0)
         self.setup_tray_icon()
         self.set_table_headers()
+        self.set_cars_table_headers()
         self.create_db_file_and_table_if_not_exists()
         self.setup_connection()
         self.setup_searching_lyts()
@@ -286,8 +291,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         path = os.path.join(os.path.dirname(__file__), "data", "database.db")
         self.db.setDatabaseName(path)
         if self.db.open():
+            self.query = QSqlQuery()
             if "faktury" not in self.db.tables():
-                self.query = QSqlQuery()
                 self.query.exec(
                     """CREATE TABLE IF NOT EXISTS faktury (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -305,7 +310,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 )
                 print(self.query.lastError().text())
             if "sprzedawcy" not in self.db.tables():
-                self.query = QSqlQuery()
                 self.query.exec(
                     """CREATE TABLE IF NOT EXISTS sprzedawcy (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -314,7 +318,42 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     )"""
                 )
                 print(self.query.lastError().text())
-
+            if "samochody" not in self.db.tables():
+                self.query.exec(
+                    """
+                    CREATE TABLE IF NOT EXISTS samochody (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    marka TEXT,
+                    model TEXT,
+                    data_zakupu TEXT,
+                    nr_rejestracyjny TEXT,
+                    firma TEXT,
+                    pliki TEXT
+                    )"""
+                )
+                print(self.query.lastError().text())
+            if "przeglady" not in self.db.tables():
+                self.query.exec(
+                    """
+                    CREATE TABLE IF NOT EXISTS przeglady (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id_samochodu INTEGER,
+                    data_przegladu TEXT,
+                    okres_przegladu TEXT
+                    )"""
+                )
+                print(self.query.lastError().text())
+            if "ubezpieczenie" not in self.db.tables():
+                self.query.exec(
+                    """
+                    CREATE TABLE IF NOT EXISTS ubezpieczenie (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    id_samochodu INTEGER,
+                    data_zawarcia_ubezpieczenia TEXT,
+                    okres_waznosci TEXT
+                    )"""
+                )
+                print(self.query.lastError().text())
         else:
             QMessageBox.critical(
                 self,
@@ -324,6 +363,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             )
 
     def populating_table(self):
+        # Clear the table.
+        self.tableWidget.setRowCount(0)
+        self.tableWidget.clearContents()
         if not self.is_logged:
             login = Login()
             login.exec()
@@ -331,9 +373,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.is_logged = True
             else:
                 return
-        # Clear the table.
-        self.tableWidget.setRowCount(0)
-        self.tableWidget.clearContents()
         # Create a query to select the data.
         elements = ["deleted = 0"]
         elements.extend(self.search_clause_elements)
@@ -385,6 +424,73 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     row, col, QTableWidgetItem(str(self.query.value(col + 1)))
                 )
 
+        #### CARS ####
+        self.table_cars.setRowCount(0)
+        self.table_cars.clearContents()
+        self.query.exec("SELECT id, marka, model, nr_rejestracyjny FROM samochody")
+        cars = {}
+        while self.query.next():
+            cars[self.query.value(0)] = [
+                self.query.value(1),
+                self.query.value(2),
+                self.query.value(3),
+            ]
+        for car_id in cars.keys():
+            # Przeglad
+            self.query.exec(
+                "SELECT data_przegladu, okres_przegladu FROM przeglady WHERE id_samochodu = {} ORDER BY data_przegladu DESC LIMIT 1".format(
+                    car_id
+                )
+            )
+            if self.query.next():
+                data = self.query.value(0)
+                okres = self.query.value(1)
+                # convert data to date
+                data = datetime.strptime(data, "%Y-%m-%d")
+                # add okres to data
+                data = data.replace(year=data.year + int(okres))
+                # get today's date
+                today = datetime.today()
+                nastepny_przeglad_za_dni = (data - today).days
+                print("Następny przegląd za {} dni".format(nastepny_przeglad_za_dni))
+                cars[car_id].append(
+                    "{}dni --- {}".format(nastepny_przeglad_za_dni, data.date())
+                )
+            else:
+                cars[car_id].append("brak informacji")
+
+            # Ubezpieczenie
+            self.query.exec(
+                "SELECT data_zawarcia_ubezpieczenia, okres_waznosci FROM ubezpieczenie WHERE id_samochodu = {} ORDER BY data_zawarcia_ubezpieczenia DESC LIMIT 1".format(
+                    car_id
+                )
+            )
+            if self.query.next():
+                data = self.query.value(0)
+                okres = self.query.value(1)
+                # convert data to date
+                data = datetime.strptime(data, "%Y-%m-%d")
+                # add okres to data
+                data = data.replace(year=data.year + int(okres))
+                # get today's date
+                today = datetime.today()
+                nastepne_ubezpieczenie_za_dni = (data - today).days
+                print(
+                    "Następne ubezpieczenie za {} dni".format(
+                        nastepne_ubezpieczenie_za_dni
+                    )
+                )
+                cars[car_id].append(
+                    "{}dni --- {}".format(nastepne_ubezpieczenie_za_dni, data.date())
+                )
+            else:
+                cars[car_id].append(None)
+        for car in cars.values():
+            row = self.table_cars.rowCount()
+            self.table_cars.insertRow(row)
+            for col, value in enumerate(car):
+                self.table_cars.setItem(row, col, QTableWidgetItem(str(value)))
+
     def finding_current_row_fv_data(self):
         if self.tableWidget.currentRow() == -1:
             return
@@ -427,41 +533,46 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_faktury_delete.triggered.connect(self.evt_delete_invoice)
         self.action_faktury_settings.triggered.connect(self.evt_settings)
 
-        self.action_wyszukiwanie_search.triggered.connect(self.evt_search_fv)
+        self.action_faktury_search.triggered.connect(self.evt_search_fv)
 
-        self.action_sortowanie_domyslne.setChecked(True)
-        self.action_sortowanie_domyslne.triggered.connect(self.evt_sort_default)
-        self.action_sortowanie_Data_wystawienia.triggered.connect(
+        self.action_sortowanie_FV_domyslne.setChecked(True)
+        self.action_sortowanie_FV_domyslne.triggered.connect(self.evt_sort_default)
+        self.action_sortowanie_FV_Data_wystawienia.triggered.connect(
             self.evt_sort_data_wystawienia
         )
-        self.action_sortowanie_numer_FV.triggered.connect(self.evt_sort_numer_fv)
-        self.action_sortowanie_sprzedawca.triggered.connect(self.evt_sort_sprzedawca)
-        self.action_sortowanie_Kwota_netto.triggered.connect(self.evt_sort_kwota_netto)
-        self.action_sortowanie_Kwota_brutto.triggered.connect(
+        self.action_sortowanie_FV_numer_FV.triggered.connect(self.evt_sort_numer_fv)
+        self.action_sortowanie_FV_sprzedawca.triggered.connect(self.evt_sort_sprzedawca)
+        self.action_sortowanie_FV_Kwota_netto.triggered.connect(
+            self.evt_sort_kwota_netto
+        )
+        self.action_sortowanie_FV_Kwota_brutto.triggered.connect(
             self.evt_sort_kwota_brutto
         )
-        self.action_sortowanie_numer_konta_bankowego.triggered.connect(
+        self.action_sortowanie_FV_numer_konta_bankowego.triggered.connect(
             self.evt_sort_bank_account_number
         )
-        self.action_sortowanie_Status_FV.triggered.connect(self.evt_sort_status_fv)
-        self.action_sortowanie_termin_platnosci.triggered.connect(
+        self.action_sortowanie_FV_Status_FV.triggered.connect(self.evt_sort_status_fv)
+        self.action_sortowanie_FV_termin_platnosci.triggered.connect(
             self.evt_sort_termin_platnosci
         )
 
-        self.action_sortowanie_rosnaco.setChecked(True)
-        self.action_sortowanie_rosnaco.triggered.connect(self.evt_sort_ascending)
-        self.action_sortowanie_malejaco.triggered.connect(self.evt_sort_descending)
+        self.action_sortowanie_FV_rosnaco.setChecked(True)
+        self.action_sortowanie_FV_rosnaco.triggered.connect(self.evt_sort_ascending)
+        self.action_sortowanie_FV_malejaco.triggered.connect(self.evt_sort_descending)
 
-        self.action_wyswietlanie_Wszystkie.setChecked(True)
-        self.action_wyswietlanie_Wszystkie.triggered.connect(self.evt_show_all)
-        self.action_wyswietlanie_Nieoplacone.triggered.connect(self.evt_show_unpaid)
-        self.action_wyswietlanie_Oplacone.triggered.connect(self.evt_show_paid)
+        self.action_wyswietlanie_FV_Wszystkie.setChecked(True)
+        self.action_wyswietlanie_FV_Wszystkie.triggered.connect(self.evt_show_all)
+        self.action_wyswietlanie_FV_Nieoplacone.triggered.connect(self.evt_show_unpaid)
+        self.action_wyswietlanie_FV_Oplacone.triggered.connect(self.evt_show_paid)
 
         # ACTION CLICK COLUMN SORTING
         self.tableWidget.horizontalHeader().sectionClicked.connect(self.sorting)
 
         # TABLE WIDGET CLICK CONNECTIONS
         self.tableWidget.cellDoubleClicked.connect(self.evt_table_double_clicked)
+
+        # CHANGE TAB WIDGET CONNECTIONS
+        self.tabWidget.currentChanged.connect(self.evt_tab_changed)
 
     ### TABLE WIDGET ###
 
@@ -487,6 +598,22 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tableWidget.setColumnWidth(5, 170)
         self.tableWidget.setColumnWidth(6, 80)
         self.tableWidget.setColumnWidth(7, 120)
+
+    def set_cars_table_headers(self):
+        self.table_cars.setHorizontalHeaderLabels(
+            [
+                "Marka",
+                "Model",
+                "Numer rejestracyjny",
+                "Następny przegląd",
+                "Koniec ubezpieczenia",
+            ]
+        )
+        self.table_cars.setColumnWidth(0, 150)
+        self.table_cars.setColumnWidth(1, 150)
+        self.table_cars.setColumnWidth(2, 150)
+        self.table_cars.setColumnWidth(3, 250)
+        self.table_cars.setColumnWidth(4, 250)
 
     def get_column_sql_name(self, index):
         match index:
@@ -562,14 +689,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 QMessageBox.warning(
                     self,
                     "Błąd",
-                    "Nie można otworzyć pliku. Plik nie jest w formacie PDF lub jest pusty",
+                    "Nie można otworzyć pliku. Prawdopodobnie plik nie istnieje, nie jest w formacie PDF lub jest pusty",
                     QMessageBox.StandardButton.Ok,
                 )
         else:
             QMessageBox.warning(
                 self,
                 "Błąd",
-                "Nie można otworzyć pliku. Plik nie jest w formacie PDF lub jest pusty",
+                "Nie można otworzyć pliku. Prawdopodobnie plik nie istnieje, nie jest w formacie PDF lub jest pusty",
                 QMessageBox.StandardButton.Ok,
             )
 
@@ -598,8 +725,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 "yyyy-MM-dd"
             ) == self.query.value(0):
                 tommorow += 1
-            else:
+            # do 2 tygodni
+            elif QDate.currentDate().addDays(14).toString(
+                "yyyy-MM-dd"
+            ) >= self.query.value(0):
                 more_days += 1
+        if not overdue and not today and not tommorow and not more_days:
+            return
         nieoplacone = Nieoplacone(overdue, today, tommorow, more_days)
         nieoplacone.exec()
         if nieoplacone.what_to_do == 1:
@@ -610,46 +742,80 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.wait.start()
             self.wait.waited_emit.connect(self.set_not_paid_info)
 
-    ### EVENT HANDLERS - ACTION ###
+    ### EVENT HANDLERS ###
+
     def unchecked_sort(self, index):
-        self.action_sortowanie_domyslne.setChecked(False)
-        self.action_sortowanie_Data_wystawienia.setChecked(False)
-        self.action_sortowanie_numer_FV.setChecked(False)
-        self.action_sortowanie_sprzedawca.setChecked(False)
-        self.action_sortowanie_Kwota_netto.setChecked(False)
-        self.action_sortowanie_Kwota_brutto.setChecked(False)
-        self.action_sortowanie_numer_konta_bankowego.setChecked(False)
-        self.action_sortowanie_Status_FV.setChecked(False)
-        self.action_sortowanie_termin_platnosci.setChecked(False)
+        self.action_sortowanie_FV_domyslne.setChecked(False)
+        self.action_sortowanie_FV_Data_wystawienia.setChecked(False)
+        self.action_sortowanie_FV_numer_FV.setChecked(False)
+        self.action_sortowanie_FV_sprzedawca.setChecked(False)
+        self.action_sortowanie_FV_Kwota_netto.setChecked(False)
+        self.action_sortowanie_FV_Kwota_brutto.setChecked(False)
+        self.action_sortowanie_FV_numer_konta_bankowego.setChecked(False)
+        self.action_sortowanie_FV_Status_FV.setChecked(False)
+        self.action_sortowanie_FV_termin_platnosci.setChecked(False)
 
         match index:
             case -1:
-                self.action_sortowanie_domyslne.setChecked(True)
+                self.action_sortowanie_FV_domyslne.setChecked(True)
             case 0:
-                self.action_sortowanie_Data_wystawienia.setChecked(True)
+                self.action_sortowanie_FV_Data_wystawienia.setChecked(True)
             case 1:
-                self.action_sortowanie_numer_FV.setChecked(True)
+                self.action_sortowanie_FV_numer_FV.setChecked(True)
             case 2:
-                self.action_sortowanie_sprzedawca.setChecked(True)
+                self.action_sortowanie_FV_sprzedawca.setChecked(True)
             case 3:
-                self.action_sortowanie_Kwota_netto.setChecked(True)
+                self.action_sortowanie_FV_Kwota_netto.setChecked(True)
             case 4:
-                self.action_sortowanie_Kwota_brutto.setChecked(True)
+                self.action_sortowanie_FV_Kwota_brutto.setChecked(True)
             case 5:
-                self.action_sortowanie_numer_konta_bankowego.setChecked(True)
+                self.action_sortowanie_FV_numer_konta_bankowego.setChecked(True)
             case 6:
-                self.action_sortowanie_Status_FV.setChecked(True)
+                self.action_sortowanie_FV_Status_FV.setChecked(True)
             case 7:
-                self.action_sortowanie_termin_platnosci.setChecked(True)
+                self.action_sortowanie_FV_termin_platnosci.setChecked(True)
 
     def change_sort_order(self):
-        self.action_sortowanie_rosnaco.setChecked(self.sorting_ascending)
-        self.action_sortowanie_malejaco.setChecked(not self.sorting_ascending)
+        self.action_sortowanie_FV_rosnaco.setChecked(self.sorting_ascending)
+        self.action_sortowanie_FV_malejaco.setChecked(not self.sorting_ascending)
 
     def unchecked_display(self):
-        self.action_wyswietlanie_Wszystkie.setChecked(False)
-        self.action_wyswietlanie_Nieoplacone.setChecked(False)
-        self.action_wyswietlanie_Oplacone.setChecked(False)
+        self.action_wyswietlanie_FV_Wszystkie.setChecked(False)
+        self.action_wyswietlanie_FV_Nieoplacone.setChecked(False)
+        self.action_wyswietlanie_FV_Oplacone.setChecked(False)
+
+    def evt_tab_changed(self, index):
+        if index == 0:
+            self.toolBar.clear()
+            self.toolBar.addAction(self.action_faktury_Dodaj_FV)
+            self.toolBar.addAction(self.action_faktury_open_pdf)
+            self.toolBar.addAction(self.action_faktury_zaplac)
+            self.toolBar.addSeparator()
+            self.toolBar.addAction(self.action_faktury_search)
+            self.toolBar.addSeparator()
+            self.toolBar.addAction(self.action_wyswietlanie_FV_Wszystkie)
+            self.toolBar.addAction(self.action_wyswietlanie_FV_Nieoplacone)
+            self.toolBar.addSeparator()
+            self.toolBar.addAction(self.action_sortowanie_FV_domyslne)
+            self.toolBar.addAction(self.action_sortowanie_FV_rosnaco)
+            self.toolBar.addAction(self.action_sortowanie_FV_malejaco)
+
+            self.menuSamochody.setEnabled(False)
+            self.menuFaktury.setEnabled(True)
+            self.menuSortowanie_FV.setEnabled(True)
+            self.menuWyswietlanie_FV.setEnabled(True)
+        elif index == 1:
+            self.toolBar.clear()
+            self.toolBar.addAction(self.action_samochody_karta_Pojazdu)
+            self.toolBar.addSeparator()
+            self.toolBar.addAction(self.action_samochody_dodaj_Samochod)
+            self.toolBar.addAction(self.action_samochody_dodaj_Przeglad)
+            self.toolBar.addAction(self.action_samochody_dodaj_Ubezpieczenie)
+
+            self.menuFaktury.setEnabled(False)
+            self.menuSortowanie_FV.setEnabled(False)
+            self.menuWyswietlanie_FV.setEnabled(False)
+            self.menuSamochody.setEnabled(True)
 
     def evt_add_fv(self):
         new_fv = Dodawanie_Edytowanie_Faktury()
@@ -718,29 +884,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.sorting_ascending == True:
             self.sorting(self.sort_index)
         else:
-            self.action_sortowanie_malejaco.setChecked(True)
+            self.action_sortowanie_FV_malejaco.setChecked(True)
 
     def evt_sort_ascending(self):
         if self.sorting_ascending == False:
             self.sorting(self.sort_index)
         else:
-            self.action_sortowanie_rosnaco.setChecked(True)
+            self.action_sortowanie_FV_rosnaco.setChecked(True)
 
     def evt_show_all(self):
         self.unchecked_display()
-        self.action_wyswietlanie_Wszystkie.setChecked(True)
+        self.action_wyswietlanie_FV_Wszystkie.setChecked(True)
         self.show_all_unpaid_paid = 0
         self.populating_table()
 
     def evt_show_unpaid(self):
         self.unchecked_display()
-        self.action_wyswietlanie_Nieoplacone.setChecked(True)
+        self.action_wyswietlanie_FV_Nieoplacone.setChecked(True)
         self.show_all_unpaid_paid = 1
         self.populating_table()
 
     def evt_show_paid(self):
         self.unchecked_display()
-        self.action_wyswietlanie_Oplacone.setChecked(True)
+        self.action_wyswietlanie_FV_Oplacone.setChecked(True)
         self.show_all_unpaid_paid = 2
         self.populating_table()
 
@@ -758,7 +924,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.menu.addAction("Dodaj fakturę")
         self.menu.addAction("Zamknij")
         self.tray_icon.setContextMenu(self.menu)
-        # add actions
         self.menu.triggered.connect(self.menu_triggered)
         # on mouse right click
         self.tray_icon.activated.connect(self.tray_activation)
@@ -768,6 +933,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if reason == QSystemTrayIcon.ActivationReason.Trigger:
             if self.isHidden():
                 self.show()
+                self.populating_table()
             else:
                 self.hide()
 
@@ -784,6 +950,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.hide()
 
     def closeEvent(self, event):
+        self.tray_icon.show()
         self.is_logged = False
         event.ignore()
         self.hide()
