@@ -64,7 +64,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Przypomnienia"))
         self.Monday.setText(_translate("Dialog", "Poniedziałek"))
         self.Tuesday.setText(_translate("Dialog", "Wtorek"))
         self.Wednesday.setText(_translate("Dialog", "Środa"))

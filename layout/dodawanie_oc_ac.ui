@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>158</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dodawanie OC/AC</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>20</y>
+     <width>402</width>
+     <height>134</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+      <item row="4" column="1">
+       <widget class="QComboBox" name="combo_box_okres">
+        <item>
+         <property name="text">
+          <string>1 rok</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2 lata</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>3 lata</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>4 lata</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>5 lat</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_samochod">
+        <property name="text">
+         <string>Samochód: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_okres_zawarcia">
+        <property name="text">
+         <string>Okres zawarcia: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="combo_box_samochod">
+        <item>
+         <property name="text">
+          <string>Techtronic</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Moto-Majster</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Techtronic Constractions</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Prywatnie</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDateEdit" name="date_edit_data_zawarcia_ubezpieczenia"/>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_data_zawarcia_ubezpieczenia">
+        <property name="text">
+         <string>Data zawarcia ubezpieczenia: </string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="btn_cancel">
+        <property name="text">
+         <string>Anuluj</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btn_submit">
+        <property name="text">
+         <string>Dodaj</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>combo_box_samochod</tabstop>
+  <tabstop>date_edit_data_zawarcia_ubezpieczenia</tabstop>
+  <tabstop>combo_box_okres</tabstop>
+  <tabstop>btn_cancel</tabstop>
+  <tabstop>btn_submit</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

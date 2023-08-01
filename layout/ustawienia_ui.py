@@ -72,7 +72,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Ustawienia"))
         item = self.powiadomienia_table.horizontalHeaderItem(0)
         item.setText(_translate("Dialog", "Pon"))
         item = self.powiadomienia_table.horizontalHeaderItem(1)
@@ -91,5 +91,10 @@ class Ui_Dialog(object):
         item.setText(_translate("Dialog", "Godzina"))
         self.powiadomienia_add.setText(_translate("Dialog", "Dodaj"))
         self.powiadomienia_delete.setText(_translate("Dialog", "Usuń"))
-        self.ustawienia.setTabText(self.ustawienia.indexOf(self.powiadomienia), _translate("Dialog", "Powiadomienia"))
-        self.ustawienia.setTabText(self.ustawienia.indexOf(self.itd), _translate("Dialog", "ITD"))
+        self.ustawienia.setTabText(
+            self.ustawienia.indexOf(self.powiadomienia),
+            _translate("Dialog", "Powiadomienia"),
+        )
+        self.ustawienia.setTabText(
+            self.ustawienia.indexOf(self.itd), _translate("Dialog", "ITD")
+        )

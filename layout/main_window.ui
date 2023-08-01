@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1303</width>
-    <height>789</height>
+    <width>1440</width>
+    <height>1147</height>
    </rect>
   </property>
   <property name="baseSize">
@@ -45,7 +45,7 @@
      <item>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="Faktury">
         <attribute name="title">
@@ -885,8 +885,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1303</width>
-     <height>21</height>
+     <width>1440</width>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFaktury">

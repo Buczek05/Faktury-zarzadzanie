@@ -9,8 +9,12 @@ from remember_system import Remember_system, Worker_wait_x_min
 from nieoplacone import Nieoplacone
 from settings import Settings
 from placenie import Payment
+from dodawanie_samochodu import Dodawanie_Edytowanie_Samochodu
+from dodawanie_OC import DodawanieOCAC
 from datetime import datetime
 from login import Login
+from openfile import open_file
+from dodawanie_przegladu import DodawaniePrzegladu
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
@@ -452,7 +456,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # get today's date
                 today = datetime.today()
                 nastepny_przeglad_za_dni = (data - today).days
-                print("Następny przegląd za {} dni".format(nastepny_przeglad_za_dni))
                 cars[car_id].append(
                     "{}dni --- {}".format(nastepny_przeglad_za_dni, data.date())
                 )
@@ -461,7 +464,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             # Ubezpieczenie
             self.query.exec(
-                "SELECT data_zawarcia_ubezpieczenia, okres_waznosci FROM ubezpieczenie WHERE id_samochodu = {} ORDER BY data_zawarcia_ubezpieczenia DESC LIMIT 1".format(
+                "SELECT data_zawarcia_ubezpieczenia, okres_waznosci FROM ubezpieczenie WHERE id_samochodu = {} ORDER BY data_zawarcia_ubezpieczenia DESC, okres_waznosci DESC LIMIT 1".format(
                     car_id
                 )
             )
@@ -475,16 +478,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 # get today's date
                 today = datetime.today()
                 nastepne_ubezpieczenie_za_dni = (data - today).days
-                print(
-                    "Następne ubezpieczenie za {} dni".format(
-                        nastepne_ubezpieczenie_za_dni
-                    )
-                )
                 cars[car_id].append(
                     "{}dni --- {}".format(nastepne_ubezpieczenie_za_dni, data.date())
                 )
             else:
-                cars[car_id].append(None)
+                cars[car_id].append("brak informacji")
         for car in cars.values():
             row = self.table_cars.rowCount()
             self.table_cars.insertRow(row)
@@ -573,6 +571,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # CHANGE TAB WIDGET CONNECTIONS
         self.tabWidget.currentChanged.connect(self.evt_tab_changed)
+
+        # CARS
+        self.action_samochody_dodaj_Samochod.triggered.connect(self.evt_add_car)
+        self.action_samochody_dodaj_Przeglad.triggered.connect(self.evt_add_review)
+        self.action_samochody_dodaj_Ubezpieczenie.triggered.connect(
+            self.evt_add_insurance
+        )
+        self.action_samochody_karta_Pojazdu.triggered.connect(
+            self.evt_table_cars_double_clicked
+        )
+
+        self.table_cars.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+        self.table_cars.cellDoubleClicked.connect(self.evt_table_cars_double_clicked)
 
     ### TABLE WIDGET ###
 
@@ -684,7 +695,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if ".pdf" in file:
             file = os.path.join(os.path.dirname(__file__), "data", "pdf", file)
             try:
-                os.startfile(file)
+                open_file(file)
             except:
                 QMessageBox.warning(
                     self,
@@ -742,7 +753,34 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.wait.start()
             self.wait.waited_emit.connect(self.set_not_paid_info)
 
+    def get_current_row_car_id(self):
+        id_samochodu = None
+        current_row = self.table_cars.currentRow()
+        if current_row != -1:
+            nr_rejestracyjny = self.table_cars.item(current_row, 2).text()
+            self.query.exec(
+                "SELECT id FROM samochody WHERE nr_rejestracyjny = '"
+                + nr_rejestracyjny
+                + "'"
+            )
+            self.query.next()
+            id_samochodu = self.query.value(0)
+        return id_samochodu
+
     ### EVENT HANDLERS ###
+    def evt_table_cars_double_clicked(self, row=None, column=None):
+        id_samochodu = self.get_current_row_car_id()
+        if id_samochodu == -1 or not id_samochodu:
+            QMessageBox.warning(
+                self,
+                "Błąd",
+                "Nie wybrano pojazdu",
+                QMessageBox.StandardButton.Ok,
+            )
+            return
+        window = Dodawanie_Edytowanie_Samochodu(id_samochodu)
+        window.exec()
+        self.populating_table()
 
     def unchecked_sort(self, index):
         self.action_sortowanie_FV_domyslne.setChecked(False)
@@ -908,6 +946,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.unchecked_display()
         self.action_wyswietlanie_FV_Oplacone.setChecked(True)
         self.show_all_unpaid_paid = 2
+        self.populating_table()
+
+    def evt_add_car(self):
+        window = Dodawanie_Edytowanie_Samochodu()
+        window.exec()
+        self.populating_table()
+
+    def evt_add_insurance(self):
+        id_samochodu = self.get_current_row_car_id()
+
+        window = DodawanieOCAC(id_samochodu)
+        window.exec()
+        self.populating_table()
+
+    def evt_add_review(self):
+        id_samochodu = self.get_current_row_car_id()
+
+        window = DodawaniePrzegladu(id_samochodu)
+        window.exec()
         self.populating_table()
 
     ### CLOSE WINDOW ###

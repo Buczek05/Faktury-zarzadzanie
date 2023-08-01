@@ -25,7 +25,9 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.title.setFont(font)
-        self.title.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter|QtCore.Qt.AlignmentFlag.AlignTop)
+        self.title.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignTop
+        )
         self.title.setObjectName("title")
         self.verticalLayout.addWidget(self.title)
         self.zalegle = QtWidgets.QLabel(parent=self.verticalLayoutWidget)
@@ -65,7 +67,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Przypomnienia"))
         self.title.setText(_translate("Dialog", "Nieopłacone FV"))
         self.zalegle.setText(_translate("Dialog", "Zaległe - "))
         self.dzisiaj.setText(_translate("Dialog", "Dzisiaj - "))

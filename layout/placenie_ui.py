@@ -25,7 +25,9 @@ class Ui_Dialog(object):
         font.setBold(True)
         font.setWeight(75)
         self.title.setFont(font)
-        self.title.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter|QtCore.Qt.AlignmentFlag.AlignTop)
+        self.title.setAlignment(
+            QtCore.Qt.AlignmentFlag.AlignHCenter | QtCore.Qt.AlignmentFlag.AlignTop
+        )
         self.title.setObjectName("title")
         self.verticalLayout.addWidget(self.title)
         self.firma = QtWidgets.QLabel(parent=self.verticalLayoutWidget)
@@ -62,7 +64,7 @@ class Ui_Dialog(object):
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
-        Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
+        Dialog.setWindowTitle(_translate("Dialog", "Płacenie FV"))
         self.title.setText(_translate("Dialog", "Płacenie FV"))
         self.firma.setText(_translate("Dialog", "Firma - "))
         self.nr_fv.setText(_translate("Dialog", "Numer FV - "))

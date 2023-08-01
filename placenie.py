@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtSql import *
 from PyQt6.QtCore import *
 import os
+from openfile import open_file
 
 
 class Payment(QDialog, Ui_Dialog):
@@ -60,7 +61,7 @@ class Payment(QDialog, Ui_Dialog):
         if ".pdf" in file:
             file = os.path.join(os.path.dirname(__file__), "data", "pdf", file)
             try:
-                os.startfile(file)
+                open_file(file)
             except:
                 QMessageBox.warning(
                     self,
